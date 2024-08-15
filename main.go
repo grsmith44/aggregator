@@ -18,7 +18,8 @@ type apiConfig struct {
 func dbSetup(dbURL string) apiConfig {
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Fatal("Failed to open database connection with error: %s", err)
+		log.Printf("Failed to open database connection with error: %s", err)
+		log.Fatal()
 	}
 	dbQueries := database.New(db)
 	apiCfg := apiConfig{
@@ -43,6 +44,7 @@ func main() {
 
 	mux.HandleFunc("GET /v1/healthz", readinessHandler)
 	mux.HandleFunc("GET /v1/err", errorHandler)
+	mux.HandleFunc("POST /v1/users", apiCfg.createUserHandler)
 
 	server := http.Server{
 		Addr:    ":" + port,

@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grsmith44/aggregator/internal/database"
+	"github.com/grsmith44/aggregator.git/internal/database"
 
 	"github.com/google/uuid"
 )
 
-func (cfg *configApi) createUserHandler(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -22,10 +22,15 @@ func (cfg *configApi) createUserHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := cfg.DB.CreateUser(r.context(), database.CreateUserParams{
-		ID:         uuid.New(),
-		CREATED_AT: time.Now(),
-		UPDATED_AT: time.Now(),
-		USER_NAME:  params.Name,
+	user, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserName:  params.Name,
 	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
+	}
+
+	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }
