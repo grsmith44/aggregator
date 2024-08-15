@@ -44,3 +44,11 @@ func databaseFeedToFeed(feed database.Feed) Feed {
 		feed.UserID,
 	}
 }
+
+func selectAllfeeds(feed_lst []database.Feed) []Feed {
+	output := make([]Feed, 0, len(feed_lst))
+	for i := 0; i < len(feed_lst); i++ {
+		output = append(output, databaseFeedToFeed(feed_lst[i]))
+	}
+	return output
+}

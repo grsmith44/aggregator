@@ -49,6 +49,7 @@ func main() {
 	mux.HandleFunc("GET /v1/users", apiCfg.middlewareAuth(apiCfg.getUserAPIHandler))
 
 	mux.HandleFunc("POST /v1/feeds", apiCfg.middlewareAuth(apiCfg.createFeedHandler))
+	mux.HandleFunc("GET /v1/feeds", apiCfg.getAllFeedsHandler)
 
 	mux.HandleFunc("GET /v1/healthz", readinessHandler)
 	mux.HandleFunc("GET /v1/err", errorHandler)
