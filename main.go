@@ -31,21 +31,27 @@ func dbSetup(dbURL string) apiConfig {
 func main() {
 	godotenv.Load(".env")
 	port := os.Getenv("PORT")
-	dbURL := os.Getenv("DATABASE_URL")
 	const filepathRoot = "."
+	if port == "" {
+		log.Fatal("PORT environment variable is not set")
+	}
+
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL environment variable is not set")
+	}
 
 	apiCfg := dbSetup(dbURL)
 
 	mux := http.NewServeMux()
 
-	fsHandler := http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))
+	mux.HandleFunc("POST /v1/users", apiCfg.createUserHandler)
+	mux.HandleFunc("GET /v1/users", apiCfg.middlewareAuth(apiCfg.getUserAPIHandler))
 
-	mux.Handle("/app/*", fsHandler)
+	mux.HandleFunc("POST /v1/feeds", apiCfg.middlewareAuth(apiCfg.createFeedHandler))
 
 	mux.HandleFunc("GET /v1/healthz", readinessHandler)
 	mux.HandleFunc("GET /v1/err", errorHandler)
-	mux.HandleFunc("POST /v1/users", apiCfg.createUserHandler)
-	mux.HandleFunc("GET /v1/users", apiCfg.getUserAPIHandler)
 
 	server := http.Server{
 		Addr:    ":" + port,
