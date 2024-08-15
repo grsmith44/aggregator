@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/grsmith44/aggregator.git/internal/database"
@@ -32,5 +33,24 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) 
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
 	}
 
+	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
+}
+
+func (cfg *apiConfig) getUserAPIHandler(w http.ResponseWriter, r *http.Request) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		respondWithError(w, http.StatusUnauthorized, "Missing Authorization header")
+	}
+
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "ApiKey" {
+		respondWithError(w, http.StatusUnauthorized, "Invalid Authorization header format")
+	}
+
+	apiKey := parts[1]
+	user, err := cfg.DB.GetUserAPI(r.Context(), apiKey)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't find API Key")
+	}
 	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }

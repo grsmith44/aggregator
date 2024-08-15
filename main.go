@@ -45,6 +45,7 @@ func main() {
 	mux.HandleFunc("GET /v1/healthz", readinessHandler)
 	mux.HandleFunc("GET /v1/err", errorHandler)
 	mux.HandleFunc("POST /v1/users", apiCfg.createUserHandler)
+	mux.HandleFunc("GET /v1/users", apiCfg.getUserAPIHandler)
 
 	server := http.Server{
 		Addr:    ":" + port,
