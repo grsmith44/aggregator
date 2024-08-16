@@ -45,10 +45,36 @@ func databaseFeedToFeed(feed database.Feed) Feed {
 	}
 }
 
-func selectAllfeeds(feed_lst []database.Feed) []Feed {
+func selectAllFeeds(feed_lst []database.Feed) []Feed {
 	output := make([]Feed, 0, len(feed_lst))
 	for i := 0; i < len(feed_lst); i++ {
 		output = append(output, databaseFeedToFeed(feed_lst[i]))
+	}
+	return output
+}
+
+type FeedFollow struct {
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ID        uuid.UUID
+	FeedID    uuid.UUID
+	UserID    uuid.UUID
+}
+
+func databaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
+	return FeedFollow{
+		CreatedAt: feedFollow.CreatedAt,
+		UpdatedAt: feedFollow.UpdatedAt,
+		ID:        feedFollow.ID,
+		FeedID:    feedFollow.FeedID,
+		UserID:    feedFollow.UserID,
+	}
+}
+
+func selectAllFeedFollows(feedFollowLst []database.FeedFollow) []FeedFollow {
+	output := make([]FeedFollow, 0, len(feedFollowLst))
+	for i := 0; i < len(feedFollowLst); i++ {
+		output = append(output, databaseFeedFollowToFeedFollow(feedFollowLst[i]))
 	}
 	return output
 }

@@ -34,8 +34,26 @@ func (cfg *apiConfig) createFeedHandler(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed")
 	}
+	feedFollow, err := cfg.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+		CreatedAt: feed.CreatedAt,
+		UpdatedAt: feed.UpdatedAt,
+		ID:        uuid.New(),
+		FeedID:    feed.ID,
+		UserID:    user.ID,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create feed")
+	}
+	type feedAndFollow struct {
+		Feed       Feed       `json:"feed"`
+		FeedFollow FeedFollow `json:"feed_follow"`
+	}
+	output := feedAndFollow{
+		Feed:       databaseFeedToFeed(feed),
+		FeedFollow: databaseFeedFollowToFeedFollow(feedFollow),
+	}
 
-	respondWithJSON(w, http.StatusOK, databaseFeedToFeed(feed))
+	respondWithJSON(w, http.StatusOK, output)
 }
 
 func (cfg *apiConfig) getAllFeedsHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +61,6 @@ func (cfg *apiConfig) getAllFeedsHandler(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Failed to retrieve all feeds")
 	}
-	feeds := selectAllfeeds(dbFeeds)
+	feeds := selectAllFeeds(dbFeeds)
 	respondWithJSON(w, http.StatusOK, feeds)
 }
