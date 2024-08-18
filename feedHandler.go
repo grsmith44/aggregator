@@ -19,7 +19,7 @@ func (cfg *apiConfig) createFeedHandler(w http.ResponseWriter, r *http.Request, 
 	params := parameters{}
 	err := decoder.Decode(&params)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters to create feed")
 		return
 	}
 
@@ -61,6 +61,6 @@ func (cfg *apiConfig) getAllFeedsHandler(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Failed to retrieve all feeds")
 	}
-	feeds := selectAllFeeds(dbFeeds)
+	feeds := batchDatabaseFeedToFeeds(dbFeeds)
 	respondWithJSON(w, http.StatusOK, feeds)
 }

@@ -26,18 +26,20 @@ func databaseUserToUser(user database.User) User {
 }
 
 type Feed struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	FeedName  string
-	Url       string
-	ID        uuid.UUID
-	UserID    uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	LastFetchedAt time.Time
+	FeedName      string
+	Url           string
+	ID            uuid.UUID
+	UserID        uuid.UUID
 }
 
 func databaseFeedToFeed(feed database.Feed) Feed {
 	return Feed{
 		feed.CreatedAt,
 		feed.UpdatedAt,
+		feed.LastFetchedAt.Time,
 		feed.FeedName,
 		feed.Url,
 		feed.ID,
@@ -45,7 +47,7 @@ func databaseFeedToFeed(feed database.Feed) Feed {
 	}
 }
 
-func selectAllFeeds(feed_lst []database.Feed) []Feed {
+func batchDatabaseFeedToFeeds(feed_lst []database.Feed) []Feed {
 	output := make([]Feed, 0, len(feed_lst))
 	for i := 0; i < len(feed_lst); i++ {
 		output = append(output, databaseFeedToFeed(feed_lst[i]))
