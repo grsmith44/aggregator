@@ -14,7 +14,6 @@ import (
 func (cfg *apiConfig) addPostToDatabase(ctx context.Context, item Item, feed Feed) {
 	publishedAt, err := time.Parse(time.RFC1123Z, item.PubDate)
 	if err != nil {
-		log.Printf("Failed to find Publish Date for: %s, link: %s", item.Title, item.Link)
 		publishedAt = time.Time{}
 	}
 	_, err = cfg.DB.CreatePost(ctx, database.CreatePostParams{
