@@ -63,6 +63,6 @@ func (cfg *apiConfig) getAllFeedFollowsForUserHandler(w http.ResponseWriter, r *
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Failed to retrieve all feeds")
 	}
-	feedFollows := selectAllFeedFollows(dbFeedFollows)
+	feedFollows := batchFeedFollowsToFeedFollows(dbFeedFollows)
 	respondWithJSON(w, http.StatusOK, feedFollows)
 }

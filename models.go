@@ -73,10 +73,38 @@ func databaseFeedFollowToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
 	}
 }
 
-func selectAllFeedFollows(feedFollowLst []database.FeedFollow) []FeedFollow {
+func batchFeedFollowsToFeedFollows(feedFollowLst []database.FeedFollow) []FeedFollow {
 	output := make([]FeedFollow, 0, len(feedFollowLst))
 	for i := 0; i < len(feedFollowLst); i++ {
 		output = append(output, databaseFeedFollowToFeedFollow(feedFollowLst[i]))
 	}
 	return output
+}
+
+type Post struct {
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	PublishedAt time.Time
+	Title       string
+	Url         string
+	Description string
+	FeedID      uuid.UUID
+}
+
+func databasePostToPost(post database.Post) Post {
+	p := Post{
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,
+		Title:     post.Title,
+		Url:       post.Url,
+		FeedID:    post.FeedID,
+	}
+	if post.PublishedAt.Valid {
+		p.PublishedAt = post.PublishedAt.Time
+	}
+	if post.Description.Valid {
+		p.Description = post.Description.String
+	}
+
+	return p
 }

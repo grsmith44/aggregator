@@ -55,7 +55,7 @@ func main() {
 	mux.HandleFunc("GET /v1/feed_follows", apiCfg.middlewareAuth(apiCfg.getAllFeedFollowsForUserHandler))
 	mux.HandleFunc("DELETE /v1/feed_follows/{feedFollowID}", apiCfg.deleteFeedFollow)
 
-	mux.HandleFunc("GET /v1/fetch_feed", fetchRSSFeedHandler)
+	mux.HandleFunc("GET /v1/fetch_full_feed", apiCfg.fetchRSSFeedHandler)
 
 	go mux.HandleFunc("GET /v1/start_feed_worker", apiCfg.startFeedWorker)
 	go mux.HandleFunc("GET /v1/stop_feed_worker", apiCfg.stopFeedWorker)

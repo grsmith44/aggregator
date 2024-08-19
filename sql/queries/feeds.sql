@@ -6,6 +6,9 @@ RETURNING *;
 -- name: SelectAllFeeds :many
 SELECT * FROM feeds;
 
+-- name: GetFeedFromID :one
+SELECT * FROM feeds
+WHERE id = $1;
 
 -- name: GetNextFeedToFetch :many
 SELECT * 
