@@ -108,3 +108,11 @@ func databasePostToPost(post database.Post) Post {
 
 	return p
 }
+
+func batchPostToPost(posts []database.Post) []Post {
+	output := make([]Post, 0, len(posts))
+	for i := 0; i < len(posts); i++ {
+		output = append(output, databasePostToPost(posts[i]))
+	}
+	return output
+}

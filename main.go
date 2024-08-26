@@ -58,7 +58,9 @@ func main() {
 	mux.HandleFunc("GET /v1/fetch_full_feed", apiCfg.fetchRSSFeedHandler)
 
 	go mux.HandleFunc("GET /v1/start_feed_worker", apiCfg.startFeedWorker)
-	go mux.HandleFunc("GET /v1/stop_feed_worker", apiCfg.stopFeedWorker)
+	mux.HandleFunc("GET /v1/stop_feed_worker", apiCfg.stopFeedWorker)
+
+	mux.HandleFunc("GET /v1/posts", apiCfg.middlewareAuth(apiCfg.getPostsByUserHandler))
 
 	mux.HandleFunc("GET /v1/healthz", readinessHandler)
 	mux.HandleFunc("GET /v1/err", errorHandler)
