@@ -1,0 +1,33 @@
+{{define "content"}}
+<h1>Feeds</h1>
+
+<h2>All Feeds</h2>
+<ul>
+    {{range .AllFeeds}}
+    <li>{{.Name}} - <a href="{{.URL}}">{{.URL}}</a> 
+        <form action="/feeds" method="post" style="display: inline;">
+            <input type="hidden" name="action" value="follow">
+            <input type="hidden" name="feed_id" value="{{.ID}}">
+            <button type="submit">Follow</button>
+        </form>
+    </li>
+    {{end}}
+</ul>
+
+<h2>Followed Feeds</h2>
+<ul>
+    {{range .FollowedFeeds}}
+    <li>{{.Name}} - <a href="{{.URL}}">{{.URL}}</a></li>
+    {{end}}
+</ul>
+
+<h2>Add New Feed</h2>
+<form action="/feeds" method="post">
+    <input type="hidden" name="action" value="add">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="url">URL:</label>
+    <input type="url" id="url" name="url" required>
+    <button type="submit">Add and Follow</button>
+</form>
+{{end}}

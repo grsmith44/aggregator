@@ -1,0 +1,61 @@
+services:
+  aggregator-app:
+    container_name: golang-container
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@aggregator-db:5432/${DB_NAME}?sslmode=disable
+      - TEST_POSTGRES_DB=${TEST_DB_NAME}
+      - TEST_POSTGRES_USER=${TEST_DB_USER}
+      - TEST_POSTGRES_PASSWORD=${TEST_DB_PASSWORD}
+      - TEST_DATABASE_URL=postgres://${TEST_DB_USER}:${TEST_DB_PASSWORD}@aggregator-db-test:5432/${TEST_DB_NAME}?sslmode=disable
+    tty: true
+    build: .
+    ports:
+      - '${PORT}:${PORT}'
+    restart: on-failure
+    volumes:
+      - .:/aggregator
+    depends_on:
+      - aggregator-db
+      - aggregator-db-test
+    networks:
+      - learning
+
+  aggregator-db:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - '1234:5432'
+    volumes:
+      - ./aggregator_data:/var/lib/postgresql/data
+    networks:
+      - learning
+
+  aggregator-db-test:
+    image: postgres:latest
+    container_name: postgres_test_container
+    environment:
+      - POSTGRES_DB=${TEST_DB_NAME}
+      - POSTGRES_USER=${TEST_DB_USER}
+      - POSTGRES_PASSWORD=${TEST_DB_PASSWORD}
+    ports:
+      - '4568:5432'
+    volumes:
+      - ./aggregator_data_test:/var/lib/postgresql/data
+    networks:
+      - learning
+
+volumes:
+  aggregator_data: {}
+  aggregator_data_test: {}
+
+# Networks to be created to facilitate communication between containers
+networks:
+  learning:
+    driver: bridge

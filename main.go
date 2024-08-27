@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"github.com/grsmith44/aggregator.git/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/pressly/goose/v3"
 )
 
 type apiConfig struct {
@@ -20,6 +22,9 @@ func dbSetup(dbURL string) apiConfig {
 	if err != nil {
 		log.Printf("Failed to open database connection with error: %s", err)
 		log.Fatal()
+	}
+	if err := goose.Up(db, "sql/schema"); err != nil {
+		log.Fatal(err)
 	}
 	dbQueries := database.New(db)
 	apiCfg := apiConfig{
@@ -40,30 +45,18 @@ func main() {
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}
-
+	TESTdbURL := os.Getenv("TEST_DATABASE_URL")
+	if TESTdbURL == "" {
+		log.Fatal("TEST_DATABASE_URL environment variable is not set")
+	}
 	apiCfg := dbSetup(dbURL)
+	apiCfgTEST := dbSetup(TESTdbURL)
+
+	tmpl := template.Must(template.ParseGlob("templates/*.html"))
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /v1/users", apiCfg.createUserHandler)
-	mux.HandleFunc("GET /v1/users", apiCfg.middlewareAuth(apiCfg.getUserAPIHandler))
-
-	mux.HandleFunc("POST /v1/feeds", apiCfg.middlewareAuth(apiCfg.createFeedHandler))
-	mux.HandleFunc("GET /v1/feeds", apiCfg.getAllFeedsHandler)
-
-	mux.HandleFunc("POST /v1/feed_follows", apiCfg.middlewareAuth(apiCfg.createFeedFollowHandler))
-	mux.HandleFunc("GET /v1/feed_follows", apiCfg.middlewareAuth(apiCfg.getAllFeedFollowsForUserHandler))
-	mux.HandleFunc("DELETE /v1/feed_follows/{feedFollowID}", apiCfg.deleteFeedFollow)
-
-	mux.HandleFunc("GET /v1/fetch_full_feed", apiCfg.fetchRSSFeedHandler)
-
-	go mux.HandleFunc("GET /v1/start_feed_worker", apiCfg.startFeedWorker)
-	mux.HandleFunc("GET /v1/stop_feed_worker", apiCfg.stopFeedWorker)
-
-	mux.HandleFunc("GET /v1/posts", apiCfg.middlewareAuth(apiCfg.getPostsByUserHandler))
-
-	mux.HandleFunc("GET /v1/healthz", readinessHandler)
-	mux.HandleFunc("GET /v1/err", errorHandler)
+	registerRoutes(mux, &apiCfg, &apiCfgTEST, tmpl)
 
 	server := http.Server{
 		Addr:    ":" + port,

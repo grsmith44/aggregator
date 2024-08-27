@@ -65,10 +65,16 @@ ORDER BY
     WHEN p.published_at IS NOT NULL THEN p.published_at
     ELSE p.created_at
   END DESC
+LIMIT COALESCE($2, 10)
 `
 
-func (q *Queries) GetPostsByUser(ctx context.Context, userID uuid.UUID) ([]Post, error) {
-	rows, err := q.db.QueryContext(ctx, getPostsByUser, userID)
+type GetPostsByUserParams struct {
+	UserID  uuid.UUID
+	Column2 interface{}
+}
+
+func (q *Queries) GetPostsByUser(ctx context.Context, arg GetPostsByUserParams) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, getPostsByUser, arg.UserID, arg.Column2)
 	if err != nil {
 		return nil, err
 	}

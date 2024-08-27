@@ -1,0 +1,38 @@
+{{define "content"}}
+<h2>Welcome, {{.Username}}</h2>
+
+<h3>Recent Posts</h3>
+<ul>
+    {{range .RecentPosts}}
+    <li>
+        <a href="{{.URL}}" target="_blank">{{.Title}}</a>
+    </li>
+    {{end}}
+</ul>
+
+<h3>Your Followed Feeds</h3>
+<ul>
+    {{range .FollowedFeeds}}
+    <li>
+        {{.Name}} - <a href="/unfollow/{{.ID}}">Unfollow</a>
+    </li>
+    {{end}}
+</ul>
+
+<h3>Add New Feed</h3>
+<form action="/add-feed" method="POST">
+    <input type="text" name="name" placeholder="Feed Name">
+    <input type="text" name="url" placeholder="Feed URL">
+    <input type="submit" value="Add and Follow">
+</form>
+
+<h3>Available Feeds</h3>
+<ul>
+    {{range .AvailableFeeds}}
+    <li>
+        {{.Name}} - <a href="/follow/{{.ID}}">Follow</a>
+    </li>
+    {{end}}
+</ul>
+
+{{end}}

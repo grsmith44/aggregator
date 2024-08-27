@@ -13,4 +13,5 @@ ORDER BY
   CASE 
     WHEN p.published_at IS NOT NULL THEN p.published_at
     ELSE p.created_at
-  END DESC;
+  END DESC
+LIMIT COALESCE($2, 10);

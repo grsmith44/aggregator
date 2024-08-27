@@ -88,3 +88,34 @@ func (q *Queries) GetAllFeedFollowsForUser(ctx context.Context, userID uuid.UUID
 	}
 	return items, nil
 }
+
+const getAllFeedNamesFollowedByUser = `-- name: GetAllFeedNamesFollowedByUser :many
+SELECT f.feed_name
+FROM feeds f
+INNER JOIN feed_follows ff ON f.feed_id = ff.feed_id
+WHERE ff.user_id = $1
+ORDER BY ff.created_at DESC
+`
+
+func (q *Queries) GetAllFeedNamesFollowedByUser(ctx context.Context, userID uuid.UUID) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getAllFeedNamesFollowedByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var feed_name string
+		if err := rows.Scan(&feed_name); err != nil {
+			return nil, err
+		}
+		items = append(items, feed_name)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

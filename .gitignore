@@ -1,2 +1,4 @@
 .env
 out
+aggregator_data/
+aggregator_data_test/

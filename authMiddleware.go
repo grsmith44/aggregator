@@ -18,7 +18,7 @@ func (cfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 		}
 
 		apiKey = strings.TrimPrefix(apiKey, "ApiKey ")
-		user, err := cfg.DB.GetUserAPI(r.Context(), apiKey)
+		user, err := cfg.DB.GetUserByAPI(r.Context(), apiKey)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Couldn't find user")
 		}
